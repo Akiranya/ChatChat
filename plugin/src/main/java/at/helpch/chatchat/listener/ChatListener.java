@@ -2,8 +2,8 @@ package at.helpch.chatchat.listener;
 
 import at.helpch.chatchat.ChatChatPlugin;
 import at.helpch.chatchat.api.user.ChatUser;
-import at.helpch.chatchat.user.ConsoleUser;
 import at.helpch.chatchat.channel.ChatChannel;
+import at.helpch.chatchat.user.ConsoleUser;
 import at.helpch.chatchat.util.ChannelUtils;
 import at.helpch.chatchat.util.FormatUtils;
 import at.helpch.chatchat.util.MessageProcessor;
@@ -28,7 +28,8 @@ public final class ChatListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST,
+                  ignoreCancelled = true)
     public void onChat(final AsyncPlayerChatEvent event) {
         try {
             event.getRecipients().clear();
@@ -42,16 +43,18 @@ public final class ChatListener implements Listener {
         final var player = event.getPlayer();
         final var user = (ChatUser) plugin.usersHolder().getUser(player);
 
-        final var channelByPrefix =
-            ChannelUtils.findChannelByPrefix(
-                List.copyOf(plugin.configManager().channels().channels().values()),
-                event.getMessage());
+        final var channelByPrefix = ChannelUtils.findChannelByPrefix(
+            List.copyOf(plugin.configManager().channels().channels().values()),
+            event.getMessage()
+        );
 
-        final var message = channelByPrefix.isEmpty() || !channelByPrefix.get().isUsableBy(user)
+        final var message =
+            channelByPrefix.isEmpty() || !channelByPrefix.get().isUsableBy(user)
             ? event.getMessage()
             : event.getMessage().replaceFirst(Pattern.quote(channelByPrefix.get().messagePrefix()), "");
 
-        var channel = channelByPrefix.isEmpty() || !channelByPrefix.get().isUsableBy(user)
+        var channel =
+            channelByPrefix.isEmpty() || !channelByPrefix.get().isUsableBy(user)
             ? user.channel()
             : channelByPrefix.get();
 
@@ -61,7 +64,8 @@ public final class ChatListener implements Listener {
 
             user.channel(ChatChannel.defaultChannel());
             user.sendMessage(plugin.configManager().messages().channelNoPermissionSwitch()
-                .replaceText(builder -> builder.matchLiteral("<default>").replacement(ChatChannel.defaultChannel().name())));
+                .replaceText(builder -> builder.matchLiteral("<default>").replacement(ChatChannel.defaultChannel().name()))
+            );
             return;
         }
 
@@ -78,14 +82,13 @@ public final class ChatListener implements Listener {
         } catch (UnknownFormatConversionException exception) {
             plugin.getLogger().severe(
                 "Your console format contains illegal characters: '%" +
-                    exception
-                        .getMessage()
-                        .replace("Conversion = ", "")
-                        .replace("'", "") +
-                    "'. You cannot use the % symbol in your console format.");
+                exception.getMessage()
+                    .replace("Conversion = ", "")
+                    .replace("'", "") +
+                "'. You cannot use the % symbol in your console format.");
             plugin.getLogger().severe(
                 "Make sure that all the PlaceholderAPI expansions for the placeholders you use in your console " +
-                    "format are installed and work properly.");
+                "format are installed and work properly.");
         }
 
         // Cancel the event if the message doesn't end up being sent
@@ -94,9 +97,10 @@ public final class ChatListener implements Listener {
     }
 
     private static String cleanseMessage(@NotNull final String message) {
-        return LEGACY_FORMATS_PATTERN.matcher(
-            LEGACY_HEX_COLOR_PATTERN.matcher(message).replaceAll("")
-        ).replaceAll("").replace("§", "");
+        String cleansed = message;
+        cleansed = LEGACY_FORMATS_PATTERN.matcher(cleansed).replaceAll("");
+        cleansed = LEGACY_HEX_COLOR_PATTERN.matcher(cleansed).replaceAll("");
+        return cleansed.replace("§", "");
     }
 
 }

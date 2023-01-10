@@ -149,8 +149,7 @@ public final class ChatUserImpl implements ChatUser {
 
         final var plugin = JavaPlugin.getPlugin(ChatChatPlugin.class);
 
-        return plugin.hookManager()
-            .vanishHooks()
+        return plugin.hookManager().vanishHooks()
             .stream()
             .filter(Objects::nonNull)
             .allMatch(hook -> hook.canSee(this, chatUser));
@@ -174,10 +173,11 @@ public final class ChatUserImpl implements ChatUser {
     @Override
     public String toString() {
         return "ChatUserImpl{" +
-                "uuid=" + uuid +
-                ", lastMessaged=" + lastMessagedUser().map(ChatUser::uuid) +
-                ", channel=" + channel +
-                ", format=" + format +
-                '}';
+               "uuid=" + uuid +
+               ", lastMessaged=" + lastMessagedUser().map(ChatUser::uuid) +
+               ", channel=" + channel +
+               ", format=" + format +
+               '}';
     }
+
 }

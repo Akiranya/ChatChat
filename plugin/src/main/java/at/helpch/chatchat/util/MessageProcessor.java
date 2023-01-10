@@ -224,8 +224,8 @@ public final class MessageProcessor {
         resolver.resolvers(plugin.miniPlaceholdersManager().compileTags(true, user, recipient));
 
         return !user.hasPermission(URL_PERMISSION)
-            ? USER_MESSAGE_MINI_MESSAGE.deserialize(message, resolver.build())
-            : USER_MESSAGE_MINI_MESSAGE.deserialize(message, resolver.build()).replaceText(URL_REPLACER_CONFIG);
+               ? USER_MESSAGE_MINI_MESSAGE.deserialize(message, resolver.build())
+               : USER_MESSAGE_MINI_MESSAGE.deserialize(message, resolver.build()).replaceText(URL_REPLACER_CONFIG);
     }
 
 }

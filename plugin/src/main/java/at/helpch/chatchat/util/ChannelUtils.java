@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class ChannelUtils {
+
     public static final String BASE_CHANNEL_PERMISSION = "chatchat.channel.";
     public static final String SEE_CHANNEL_PERMISSION = BASE_CHANNEL_PERMISSION + "see.";
     public static final String USE_CHANNEL_PERMISSION = BASE_CHANNEL_PERMISSION + "use.";
@@ -23,25 +24,25 @@ public final class ChannelUtils {
     }
 
     public static @NotNull Channel findDefaultChannel(
-            @NotNull final Map<String, Channel> channels,
-            @NotNull final String defaultChannel) {
+        @NotNull final Map<String, Channel> channels,
+        @NotNull final String defaultChannel) {
         final var channel = channels.get(defaultChannel);
         return Objects.requireNonNullElseGet(channel, ChatChannel::defaultChannel);
     }
 
     public static @NotNull Optional<Channel> findChannelByPrefix(
-            @NotNull final List<Channel> channels,
-            @NotNull final String input) {
+        @NotNull final List<Channel> channels,
+        @NotNull final String input) {
         return channels.stream()
-                .filter(channel -> !channel.messagePrefix().isEmpty()) // ignore empty prefixes
-                .filter(channel -> input.startsWith(channel.messagePrefix()))
-                .findFirst();
+            .filter(channel -> !channel.messagePrefix().isEmpty()) // ignore empty prefixes
+            .filter(channel -> input.startsWith(channel.messagePrefix()))
+            .findFirst();
     }
 
     public static boolean isTargetWithinRadius(
-            @NotNull final User source,
-            @NotNull final User target,
-            final int radius) {
+        @NotNull final User source,
+        @NotNull final User target,
+        final int radius) {
         if (!(target instanceof ChatUser)) {
             return true;
         }
@@ -56,9 +57,10 @@ public final class ChannelUtils {
             final int relativeX = targetLocation.getBlockX() - sourceLocation.getBlockX();
             final int relativeZ = targetLocation.getBlockZ() - sourceLocation.getBlockZ();
 
-            return relativeX*relativeX + relativeZ*relativeZ <= radius*radius;
+            return relativeX * relativeX + relativeZ * relativeZ <= radius * radius;
         }
 
         return true;
     }
+
 }

@@ -94,8 +94,13 @@ public final class ChatChatPlugin extends JavaPlugin {
             usersHolder::getUser,
             new UserSenderValidator(this));
 
-        configManager.reload();
+        // HookManager should be initialised before the ConfigManager
+        // because the Towny Channels are needed be first added in ChannelTypeRegistry
+        // for ConfigManager to safely call ChannelMapper#deserialize.
+        // Otherwise, the Towny Channels would not be correctly created in the first place,
+        // then causing the Toggle Commands of Towny Channels to fail to be registered.
         hookManager.init();
+        configManager.reload();
 
         // bStats
         Metrics metrics = new Metrics(this, 14781);
@@ -127,6 +132,11 @@ public final class ChatChatPlugin extends JavaPlugin {
         );
 
         getLogger().info("Plugin enabled successfully!");
+
+        // These code will run after "Done!" on the console
+        Bukkit.getScheduler().runTask(this, () -> {
+            // Empty
+        });
     }
 
     @Override

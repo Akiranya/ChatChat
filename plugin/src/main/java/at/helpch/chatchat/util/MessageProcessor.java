@@ -86,7 +86,7 @@ public final class MessageProcessor {
     ) {
         final var rulesResult = plugin.ruleManager().isAllowedPublicChat(sourceUser, message);
         if (rulesResult.isPresent()) {
-            sourceUser.sendMessage(rulesResult.get());
+            sourceUser.sendMessage(rulesResult.get()); // Send message to the source user
             return false;
         }
 

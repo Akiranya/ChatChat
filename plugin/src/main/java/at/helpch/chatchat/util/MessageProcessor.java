@@ -11,6 +11,7 @@ import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import org.jetbrains.annotations.NotNull;
@@ -212,13 +213,7 @@ public final class MessageProcessor {
         }
 
         if (user.hasPermission(ITEM_TAG_PERMISSION)) {
-            resolver.resolver(
-                ItemUtils.createItemPlaceholder(
-                    plugin.configManager().settings().itemFormat(),
-                    plugin.configManager().settings().itemFormatInfo(),
-                    user.player().getInventory().getItemInMainHand()
-                )
-            );
+            resolver.resolver(Placeholder.component("item", user.player().getInventory().getItemInMainHand().displayName()));
         }
 
         resolver.resolvers(plugin.miniPlaceholdersManager().compileTags(true, user, recipient));

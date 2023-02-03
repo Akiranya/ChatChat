@@ -1,7 +1,9 @@
 plugins {
     `java-library`
+    `maven-publish`
 }
 
+group = "at.helpch"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -23,5 +25,13 @@ tasks {
     withType<JavaCompile> {
         options.encoding = "UTF-8"
         options.compilerArgs.add("-parameters")
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
     }
 }

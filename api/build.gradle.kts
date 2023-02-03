@@ -2,7 +2,6 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id("chatchat.base-conventions")
-    id("maven-publish")
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -12,10 +11,6 @@ dependencies {
     api(libs.adventure.configurate)
 
     compileOnly(libs.paper)
-}
-
-publishing {
-
 }
 
 tasks {

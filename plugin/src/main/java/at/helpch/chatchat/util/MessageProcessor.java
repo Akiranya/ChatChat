@@ -58,28 +58,47 @@ public final class MessageProcessor {
         throw new AssertionError("Util classes are not to be instantiated!");
     }
 
+    /**
+     * Processes the message, including:
+     * <ul>
+     *     <li>fire an {@link ChatChatEvent} and check cancel state</li>
+     *     <li>decorate the message if it contains mentions</li>
+     *     <li>broadcast the message to the channel</li>
+     *     <li>......</li>
+     * </ul>
+     * <p>
+     * This method will not process (i.e. send) the message to the Console.
+     *
+     * @param plugin     the ChatChat plugin instance
+     * @param sourceUser the user who sends the message
+     * @param channel    the channel to which the message being sent
+     * @param message    the message (which is cleansed)
+     * @param async      whether it's async or not
+     *
+     * @return true if this is allowed to be sent; otherwise false
+     */
     public static boolean process(
         @NotNull final ChatChatPlugin plugin,
-        @NotNull final ChatUser chatUser,
+        @NotNull final ChatUser sourceUser,
         @NotNull final Channel channel,
         @NotNull final String message,
         final boolean async
     ) {
-        final var rulesResult = plugin.ruleManager().isAllowedPublicChat(chatUser, message);
+        final var rulesResult = plugin.ruleManager().isAllowedPublicChat(sourceUser, message);
         if (rulesResult.isPresent()) {
-            chatUser.sendMessage(rulesResult.get());
+            sourceUser.sendMessage(rulesResult.get());
             return false;
         }
 
         final var chatEvent = new ChatChatEvent(
             async,
-            chatUser,
-            FormatUtils.findFormat(chatUser.player(), channel, plugin.configManager().formats()),
+            sourceUser,
+            FormatUtils.findFormat(sourceUser.player(), channel, plugin.configManager().formats()),
             // TODO: 9/2/22 Process message for each recipient to add rel support inside the message itself.
             //  Possibly even pass the minimessage string here instead of the processed component.
-            MessageProcessor.processMessage(plugin, chatUser, ConsoleUser.INSTANCE, message),
+            MessageProcessor.processMessage(plugin, sourceUser, ConsoleUser.INSTANCE, message),
             channel,
-            channel.targets(chatUser)
+            channel.targets(sourceUser)
         );
 
         plugin.getServer().getPluginManager().callEvent(chatEvent);
@@ -88,8 +107,8 @@ public final class MessageProcessor {
             return false;
         }
 
-        final var oldChannel = chatUser.channel();
-        chatUser.channel(channel);
+        final var oldChannel = sourceUser.channel();
+        sourceUser.channel(channel);
 
         final var parsedMessage = chatEvent.message().compact();
         final var mentions = plugin.configManager().settings().mentions();
@@ -98,7 +117,7 @@ public final class MessageProcessor {
         var userIsTarget = false;
 
         for (final var targetUser : chatEvent.recipients()) {
-            if (targetUser.uuid() == chatUser.uuid()) {
+            if (targetUser.uuid() == sourceUser.uuid()) {
                 userIsTarget = true;
                 continue;
             }
@@ -109,7 +128,7 @@ public final class MessageProcessor {
             // Process mentions and get the result.
             final var mentionResult = plugin.mentionsManager().processMentions(
                 async,
-                chatUser,
+                sourceUser,
                 targetUser,
                 chatEvent.channel(),
                 parsedMessage,
@@ -120,20 +139,20 @@ public final class MessageProcessor {
 
                 final var component = FormatUtils.parseFormat(
                     chatEvent.format(),
-                    chatUser.player(),
+                    sourceUser.player(),
                     chatTarget.player(),
                     mentionResult.message(),
-                    plugin.miniPlaceholdersManager().compileTags(false, chatUser, targetUser)
+                    plugin.miniPlaceholdersManager().compileTags(false, sourceUser, targetUser)
                 );
 
-                targetUser.sendMessage(component);
+                targetUser.sendMessage(component); // Send message to this recipient
                 if (mentionResult.playSound()) {
                     targetUser.playSound(mentions.sound());
                 }
-                if (chatUser.canSee(chatTarget)) {
+                if (sourceUser.canSee(chatTarget)) {
                     userMessage = plugin.mentionsManager().processMentions(
                         async,
-                        chatUser,
+                        sourceUser,
                         chatTarget,
                         chatEvent.channel(),
                         userMessage,
@@ -145,26 +164,26 @@ public final class MessageProcessor {
 
             final var component = FormatUtils.parseFormat(
                 chatEvent.format(),
-                chatUser.player(),
+                sourceUser.player(),
                 mentionResult.message(),
-                plugin.miniPlaceholdersManager().compileTags(false, chatUser, targetUser)
+                plugin.miniPlaceholdersManager().compileTags(false, sourceUser, targetUser)
             );
 
-            targetUser.sendMessage(component);
+            targetUser.sendMessage(component); // Send message to this recipient
             if (mentionResult.playSound()) {
                 targetUser.playSound(mentions.sound());
             }
         }
 
         if (!userIsTarget) {
-            chatUser.channel(oldChannel);
+            sourceUser.channel(oldChannel);
             return true;
         }
 
         final var mentionResult = plugin.mentionsManager().processMentions(
             async,
-            chatUser,
-            chatUser,
+            sourceUser,
+            sourceUser,
             chatEvent.channel(),
             parsedMessage,
             true
@@ -172,21 +191,33 @@ public final class MessageProcessor {
 
         final var component = FormatUtils.parseFormat(
             chatEvent.format(),
-            chatUser.player(),
-            chatUser.player(),
+            sourceUser.player(),
+            sourceUser.player(),
             mentionResult.message(),
-            plugin.miniPlaceholdersManager().compileTags(false, chatUser, chatUser)
+            plugin.miniPlaceholdersManager().compileTags(false, sourceUser, sourceUser)
         );
 
-        chatUser.sendMessage(component);
+        sourceUser.sendMessage(component); // Send message to the sender itself
         if (mentionResult.playSound()) {
-            chatUser.playSound(mentions.sound());
+            sourceUser.playSound(mentions.sound());
         }
 
-        chatUser.channel(oldChannel);
+        sourceUser.channel(oldChannel);
         return true;
     }
 
+    /**
+     * Deserializes the raw (mini) message into {@link Component}.
+     * <p>
+     * This method will parse the tags depending on what permissions the user has.
+     *
+     * @param plugin    the ChatChat plugin instance
+     * @param user      the user who sends the message
+     * @param recipient the user who receives the message
+     * @param message   the message
+     *
+     * @return a component deserialized from the given params
+     */
     public static @NotNull Component processMessage(
         @NotNull final ChatChatPlugin plugin,
         @NotNull final ChatUser user,
@@ -218,8 +249,8 @@ public final class MessageProcessor {
         resolver.resolvers(plugin.miniPlaceholdersManager().compileTags(true, user, recipient));
 
         return !user.hasPermission(URL_PERMISSION)
-               ? USER_MESSAGE_MINI_MESSAGE.deserialize(message, resolver.build())
-               : USER_MESSAGE_MINI_MESSAGE.deserialize(message, resolver.build()).replaceText(URL_REPLACER_CONFIG);
+            ? USER_MESSAGE_MINI_MESSAGE.deserialize(message, resolver.build())
+            : USER_MESSAGE_MINI_MESSAGE.deserialize(message, resolver.build()).replaceText(URL_REPLACER_CONFIG);
     }
 
 }

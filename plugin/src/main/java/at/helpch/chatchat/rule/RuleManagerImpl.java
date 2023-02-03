@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class RuleManagerImpl implements RuleManager {
 
@@ -50,7 +49,7 @@ public class RuleManagerImpl implements RuleManager {
         final var unfulfilledRules = publicChatRules()
             .stream()
             .filter(rule -> !rule.isAllowedPublic(sender, message))
-            .collect(Collectors.toList());
+            .toList();
 
         if (unfulfilledRules.isEmpty()) {
             return Optional.empty();
@@ -71,7 +70,7 @@ public class RuleManagerImpl implements RuleManager {
         final var unfulfilledRules = privateChatRules()
             .stream()
             .filter(rule -> !rule.isAllowedPrivate(sender, recipient, message))
-            .collect(Collectors.toList());
+            .toList();
 
         if (unfulfilledRules.isEmpty()) {
             return Optional.empty();

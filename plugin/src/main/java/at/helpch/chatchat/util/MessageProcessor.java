@@ -60,26 +60,26 @@ public final class MessageProcessor {
 
     public static boolean process(
         @NotNull final ChatChatPlugin plugin,
-        @NotNull final ChatUser user,
+        @NotNull final ChatUser chatUser,
         @NotNull final Channel channel,
         @NotNull final String message,
         final boolean async
     ) {
-        final var rulesResult = plugin.ruleManager().isAllowedPublicChat(user, message);
+        final var rulesResult = plugin.ruleManager().isAllowedPublicChat(chatUser, message);
         if (rulesResult.isPresent()) {
-            user.sendMessage(rulesResult.get());
+            chatUser.sendMessage(rulesResult.get());
             return false;
         }
 
         final var chatEvent = new ChatChatEvent(
             async,
-            user,
-            FormatUtils.findFormat(user.player(), channel, plugin.configManager().formats()),
+            chatUser,
+            FormatUtils.findFormat(chatUser.player(), channel, plugin.configManager().formats()),
             // TODO: 9/2/22 Process message for each recipient to add rel support inside the message itself.
             //  Possibly even pass the minimessage string here instead of the processed component.
-            MessageProcessor.processMessage(plugin, user, ConsoleUser.INSTANCE, message),
+            MessageProcessor.processMessage(plugin, chatUser, ConsoleUser.INSTANCE, message),
             channel,
-            channel.targets(user)
+            channel.targets(chatUser)
         );
 
         plugin.getServer().getPluginManager().callEvent(chatEvent);
@@ -88,8 +88,8 @@ public final class MessageProcessor {
             return false;
         }
 
-        final var oldChannel = user.channel();
-        user.channel(channel);
+        final var oldChannel = chatUser.channel();
+        chatUser.channel(channel);
 
         final var parsedMessage = chatEvent.message().compact();
         final var mentions = plugin.configManager().settings().mentions();
@@ -97,44 +97,43 @@ public final class MessageProcessor {
         var userMessage = parsedMessage;
         var userIsTarget = false;
 
-        for (final var target : chatEvent.recipients()) {
-            if (target.uuid() == user.uuid()) {
+        for (final var targetUser : chatEvent.recipients()) {
+            if (targetUser.uuid() == chatUser.uuid()) {
                 userIsTarget = true;
                 continue;
             }
 
             // Console Users have their own format we set in ChatListener.java
-            if (target instanceof ConsoleUser) continue;
+            if (targetUser instanceof ConsoleUser) continue;
 
             // Process mentions and get the result.
             final var mentionResult = plugin.mentionsManager().processMentions(
                 async,
-                user,
-                target,
+                chatUser,
+                targetUser,
                 chatEvent.channel(),
                 parsedMessage,
                 true
             );
 
-            if (target instanceof ChatUser) {
-                final var chatTarget = (ChatUser) target;
+            if (targetUser instanceof final ChatUser chatTarget) {
 
                 final var component = FormatUtils.parseFormat(
                     chatEvent.format(),
-                    user.player(),
+                    chatUser.player(),
                     chatTarget.player(),
                     mentionResult.message(),
-                    plugin.miniPlaceholdersManager().compileTags(false, user, target)
+                    plugin.miniPlaceholdersManager().compileTags(false, chatUser, targetUser)
                 );
 
-                target.sendMessage(component);
+                targetUser.sendMessage(component);
                 if (mentionResult.playSound()) {
-                    target.playSound(mentions.sound());
+                    targetUser.playSound(mentions.sound());
                 }
-                if (user.canSee(chatTarget)) {
+                if (chatUser.canSee(chatTarget)) {
                     userMessage = plugin.mentionsManager().processMentions(
                         async,
-                        user,
+                        chatUser,
                         chatTarget,
                         chatEvent.channel(),
                         userMessage,
@@ -146,26 +145,26 @@ public final class MessageProcessor {
 
             final var component = FormatUtils.parseFormat(
                 chatEvent.format(),
-                user.player(),
+                chatUser.player(),
                 mentionResult.message(),
-                plugin.miniPlaceholdersManager().compileTags(false, user, target)
+                plugin.miniPlaceholdersManager().compileTags(false, chatUser, targetUser)
             );
 
-            target.sendMessage(component);
+            targetUser.sendMessage(component);
             if (mentionResult.playSound()) {
-                target.playSound(mentions.sound());
+                targetUser.playSound(mentions.sound());
             }
         }
 
         if (!userIsTarget) {
-            user.channel(oldChannel);
+            chatUser.channel(oldChannel);
             return true;
         }
 
         final var mentionResult = plugin.mentionsManager().processMentions(
             async,
-            user,
-            user,
+            chatUser,
+            chatUser,
             chatEvent.channel(),
             parsedMessage,
             true
@@ -173,18 +172,18 @@ public final class MessageProcessor {
 
         final var component = FormatUtils.parseFormat(
             chatEvent.format(),
-            user.player(),
-            user.player(),
+            chatUser.player(),
+            chatUser.player(),
             mentionResult.message(),
-            plugin.miniPlaceholdersManager().compileTags(false, user, user)
+            plugin.miniPlaceholdersManager().compileTags(false, chatUser, chatUser)
         );
 
-        user.sendMessage(component);
+        chatUser.sendMessage(component);
         if (mentionResult.playSound()) {
-            user.playSound(mentions.sound());
+            chatUser.playSound(mentions.sound());
         }
 
-        user.channel(oldChannel);
+        chatUser.channel(oldChannel);
         return true;
     }
 

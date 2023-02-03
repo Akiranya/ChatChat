@@ -59,7 +59,7 @@ public abstract class AbstractTownyChannel extends AbstractChannel {
 
             // Caution: towns/nations may contain NPC residents whose UUID does not map to a real player.
             // This leads to ChatChat creating broken User instances when calling UserHolder#getUser(UUID).
-            if (resident.isNPC()) continue;
+            if (resident.isNPC() || !resident.isOnline()) continue;
 
             UUID uuid = resident.getUUID();
             User target = users.getUser(uuid);

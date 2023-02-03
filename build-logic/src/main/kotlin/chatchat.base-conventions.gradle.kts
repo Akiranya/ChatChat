@@ -2,7 +2,7 @@ plugins {
     `java-library`
 }
 
-version = "1.0-SNAPSHOT-${System.getenv("BUILD_NUMBER")}"
+version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()

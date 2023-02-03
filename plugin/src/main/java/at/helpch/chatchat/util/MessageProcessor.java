@@ -207,7 +207,9 @@ public final class MessageProcessor {
     }
 
     /**
-     * Deserializes the raw (mini) message into {@link Component}.
+     * Deserializes the raw message into {@link Component}.
+     * <p>
+     * The given message string is typically in MiniMessage representation.
      * <p>
      * This method will parse the tags depending on what permissions the user has.
      *

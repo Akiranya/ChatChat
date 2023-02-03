@@ -28,7 +28,7 @@ dependencies {
     implementation(libs.configurate)
     implementation(libs.bstats)
 
-    compileOnly(libs.spigot)
+    compileOnly(libs.paper)
     compileOnly(libs.papi)
     compileOnly(libs.towny)
     compileOnly(libs.essentials)

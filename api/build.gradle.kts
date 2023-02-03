@@ -11,7 +11,7 @@ dependencies {
     api(libs.adventure.minimessage)
     api(libs.adventure.configurate)
 
-    compileOnly(libs.spigot)
+    compileOnly(libs.paper)
 }
 
 publishing {

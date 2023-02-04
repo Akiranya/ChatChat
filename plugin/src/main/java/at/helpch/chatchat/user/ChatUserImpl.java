@@ -162,7 +162,8 @@ public final class ChatUserImpl implements ChatUser {
 
     @Override
     public @NotNull Audience audience() {
-        return ChatChatPlugin.audiences().player(uuid);
+        Player player = Bukkit.getPlayer(uuid);
+        return player != null ? player : Audience.empty();
     }
 
     @Override

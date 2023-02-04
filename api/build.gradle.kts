@@ -6,8 +6,8 @@ plugins {
 }
 
 dependencies {
-    api(libs.adventure.bukkit)
-    api(libs.adventure.minimessage)
+    // api(libs.adventure.bukkit)
+    // api(libs.adventure.minimessage)
     api(libs.adventure.configurate)
 
     compileOnly(libs.paper)
@@ -15,8 +15,8 @@ dependencies {
 
 tasks {
     withType<ShadowJar> {
-        listOf("net.kyori",
-            "io.leangen",
+        listOf(
+            "io.leangen"
         ).forEach { relocate(it, "at.helpch.chatchat.libs.$it") }
     }
 }

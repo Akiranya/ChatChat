@@ -1,5 +1,6 @@
-import dev.triumphteam.helper.*
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import dev.triumphteam.helper.papi
+import dev.triumphteam.helper.triumphSnapshots
 
 plugins {
     id("chatchat.base-conventions")
@@ -30,10 +31,10 @@ dependencies {
 
     compileOnly(libs.paper)
     compileOnly(libs.papi)
-    compileOnly(libs.towny)
-    compileOnly(libs.essentials)
-    compileOnly(libs.discordsrv)
-    compileOnly(libs.supervanish)
+    compileOnly(libs.towny) { isTransitive = false }
+    compileOnly(libs.essentials) { isTransitive = false }
+    compileOnly(libs.discordsrv) { isTransitive = false }
+    compileOnly(libs.supervanish) { isTransitive = false }
 }
 
 bukkit {
@@ -193,7 +194,7 @@ bukkit {
 
 tasks {
     withType<ShadowJar> {
-        listOf("net.kyori",
+        listOf(
             "dev.triumphteam",
             "org.spongepowered",
             "io.leangen",

@@ -1,0 +1,124 @@
+main: ${mainClass}
+name: ChatChat
+version: ${version}
+description: DelucksChat 2.0 or smth like that
+api-version: 1.19
+authors: [ HelpChat ]
+load-before: [ ]
+load-after: [ ]
+dependencies:
+  - name: PlaceholderAPI
+    required: false
+    bootstrap: false
+  - name: Essentials
+    required: false
+    bootstrap: false
+  - name: Towny
+    required: false
+    bootstrap: false
+  - name: DiscordSRV
+    required: false
+    bootstrap: false
+  - name: SuperVanish
+    required: false
+    bootstrap: false
+permissions:
+  chatchat.admin:
+    description: Execute admin commands
+    default: op
+  chatchat.socialspy:
+    description: Spy on private messages
+    default: op
+  chatchat.test.format:
+    description: Test formats
+    default: op
+  chatchat.pm:
+    description: Send or reply to private messages
+    default: op
+  chatchat.pm.toggle:
+    description: Toggle private messages
+    default: op
+  chatchat.ignore:
+    description: Permission to use /ignore to toggle ignoring a user
+    default: op
+  chatchat.ignore.bypass:
+    description: Bypass being ignored.
+    default: op
+  chatchat.ignorelist:
+    description: List all the players that you are ignoring.
+    default: op
+  chatchat.utf:
+    description: Send any char in chat
+    default: op
+  chatchat.url:
+    description: Send clickable URLs in chat
+    default: op
+  chatchat.channel.bypass-radius:
+    description: Bypass the channel radius
+    default: op
+  chatchat.mention.personal:
+    description: Mention other players
+    default: op
+  chatchat.mention.everyone:
+    description: Mention the whole channel
+    default: op
+  chatchat.mention.personal.block:
+    description: Don't get mentioned by other players
+    default: op
+  chatchat.mention.everyone.block:
+    description: Don't get mentioned when there's a channel ping
+    default: op
+  chatchat.mention.personal.block.override:
+    description: Mention other players even when they have mentions blocked
+    default: op
+  chatchat.mention.everyone.block.override:
+    description: Mention the whole channel even those that have channel mentions blocked
+    default: op
+  chatchat.tag.item:
+    description: Use the <item> tag in chat
+    default: op
+  chatchat.tag.click:
+    description: Use the <click> tag in chat
+    default: op
+  chatchat.tag.color:
+    description: Use the <color> tags in chat
+    default: op
+  chatchat.tag.font:
+    description: Use the <font> tag in chat
+    default: op
+  chatchat.tag.gradient:
+    description: Use the <gradient> tag in chat
+    default: op
+  chatchat.tag.hover:
+    description: Use the <hover> tag in chat
+    default: op
+  chatchat.tag.keybind:
+    description: Use the <key> tag in chat
+    default: op
+  chatchat.tag.newline:
+    description: Use the <newline> tags in chat
+    default: op
+  chatchat.tag.rainbow:
+    description: Use the <rainbow> tag in chat
+    default: op
+  chatchat.tag.reset:
+    description: Use the <reset> tag in chat
+    default: op
+  chatchat.tag.translatable:
+    description: Use the <translatable> tags in chat
+    default: op
+  chatchat.tag.obfuscated:
+    description: Use the <obfuscated> tags in chat
+    default: op
+  chatchat.tag.bold:
+    description: Use the <bold> tags in chat
+    default: op
+  chatchat.tag.strikethrough:
+    description: Use the <strikethrough> tags in chat
+    default: op
+  chatchat.tag.underlined:
+    description: Use the <underlined> tags in chat
+    default: op
+  chatchat.tag.italic:
+    description: Use the <italic> tags in chat
+    default: op

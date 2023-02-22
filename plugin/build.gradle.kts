@@ -55,7 +55,7 @@ tasks {
         filesMatching("**/paper-plugin.yml") {
             expand(mapOf(
                 "version" to "${project.version}",
-                "mainClass" to "at.helpch.chatchat.ChatChatPlugin",
+                "description" to "DelucksChat 2.0 or smth like that",
             ))
         }
     }

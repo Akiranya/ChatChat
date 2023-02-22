@@ -1,7 +1,7 @@
-main: ${mainClass}
 name: ChatChat
 version: ${version}
-description: DelucksChat 2.0 or smth like that
+description: ${description}
+main: at.helpch.chatchat.ChatChatPlugin
 api-version: 1.19
 authors: [ HelpChat ]
 load-before: [ ]

@@ -28,8 +28,7 @@ public final class ChatListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST,
-                  ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onChat(final AsyncPlayerChatEvent event) {
         try {
             event.getRecipients().clear();
@@ -43,18 +42,22 @@ public final class ChatListener implements Listener {
         final var player = event.getPlayer();
         final var user = (ChatUser) plugin.usersHolder().getUser(player);
 
-        final var channelByPrefix = ChannelUtils.findChannelByPrefix(
-            List.copyOf(plugin.configManager().channels().channels().values()),
-            event.getMessage()
-        );
+        if (!user.chatEnabled()) {
+            event.setCancelled(true);
+            user.sendMessage(plugin.configManager().messages().chatDisabled());
+            return;
+        }
 
-        final var message =
-            channelByPrefix.isEmpty() || !channelByPrefix.get().isUsableBy(user)
+        final var channelByPrefix =
+            ChannelUtils.findChannelByPrefix(
+                List.copyOf(plugin.configManager().channels().channels().values()),
+                event.getMessage());
+
+        final var message = channelByPrefix.isEmpty() || !channelByPrefix.get().isUsableBy(user)
             ? event.getMessage()
             : event.getMessage().replaceFirst(Pattern.quote(channelByPrefix.get().messagePrefix()), "");
 
-        var channel =
-            channelByPrefix.isEmpty() || !channelByPrefix.get().isUsableBy(user)
+        var channel = channelByPrefix.isEmpty() || !channelByPrefix.get().isUsableBy(user)
             ? user.channel()
             : channelByPrefix.get();
 
@@ -64,8 +67,7 @@ public final class ChatListener implements Listener {
 
             user.channel(ChatChannel.defaultChannel());
             user.sendMessage(plugin.configManager().messages().channelNoPermissionSwitch()
-                .replaceText(builder -> builder.matchLiteral("<default>").replacement(ChatChannel.defaultChannel().name()))
-            );
+                .replaceText(builder -> builder.matchLiteral("<default>").replacement(ChatChannel.defaultChannel().name())));
             return;
         }
 
@@ -97,10 +99,9 @@ public final class ChatListener implements Listener {
     }
 
     private static String cleanseMessage(@NotNull final String message) {
-        String cleansed = message;
-        cleansed = LEGACY_FORMATS_PATTERN.matcher(cleansed).replaceAll("");
-        cleansed = LEGACY_HEX_COLOR_PATTERN.matcher(cleansed).replaceAll("");
-        return cleansed.replace("§", "");
+        return LEGACY_FORMATS_PATTERN.matcher(
+            LEGACY_HEX_COLOR_PATTERN.matcher(message).replaceAll("")
+        ).replaceAll("").replace("§", "");
     }
 
 }

@@ -15,14 +15,14 @@ repositories {
     // dsrv + dependencies
     maven("https://m2.dv8tion.net/releases")
     maven("https://nexus.scarsz.me/content/groups/public")
-    // supervanish
+    // supervanish, griefprevention
     maven("https://jitpack.io")
     // essentialsx
     maven("https://repo.essentialsx.net/releases/")
 }
 
 dependencies {
-    implementation(projects.api)
+    implementation(projects.chatChatApi)
 
     implementation(libs.triumph.cmds)
     implementation(libs.configurate)
@@ -34,6 +34,7 @@ dependencies {
     compileOnly(libs.essentials) { isTransitive = false }
     compileOnly(libs.discordsrv) { isTransitive = false }
     compileOnly(libs.supervanish) { isTransitive = false }
+    compileOnly(libs.griefprevention) { isTransitive = false }
 }
 
 tasks {
@@ -53,10 +54,12 @@ tasks {
     }
     processResources {
         filesMatching("**/paper-plugin.yml") {
-            expand(mapOf(
-                "version" to "${project.version}",
-                "description" to "DelucksChat 2.0 or smth like that",
-            ))
+            expand(
+                mapOf(
+                    "version" to "${project.version}",
+                    "description" to "DelucksChat 2.0 or smth like that",
+                )
+            )
         }
     }
     register("deployJar") {

@@ -17,6 +17,7 @@ import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public final class MessageProcessor {
@@ -84,16 +85,30 @@ public final class MessageProcessor {
         @NotNull final String message,
         final boolean async
     ) {
+        final var isMuted = plugin.hookManager()
+            .muteHooks()
+            .stream()
+            .filter(Objects::nonNull)
+            .anyMatch(hook -> hook.isMuted(sourceUser));
+
+        if (isMuted) {
+            return false;
+        }
+
         final var rulesResult = plugin.ruleManager().isAllowedPublicChat(sourceUser, message);
         if (rulesResult.isPresent()) {
-            sourceUser.sendMessage(rulesResult.get()); // Send message to the source user
+            sourceUser.sendMessage(rulesResult.get());
             return false;
         }
 
         final var chatEvent = new ChatChatEvent(
             async,
             sourceUser,
-            FormatUtils.findFormat(sourceUser.player(), channel, plugin.configManager().formats()),
+            FormatUtils.findFormat(
+                sourceUser.player(),
+                channel,
+                plugin.configManager().formats(),
+                plugin.configManager().extensions().addons().deluxeChatInversePriorities()),
             // TODO: 9/2/22 Process message for each recipient to add rel support inside the message itself.
             //  Possibly even pass the minimessage string here instead of the processed component.
             MessageProcessor.processMessage(plugin, sourceUser, ConsoleUser.INSTANCE, message),

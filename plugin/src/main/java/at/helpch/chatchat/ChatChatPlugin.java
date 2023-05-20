@@ -6,6 +6,7 @@ import at.helpch.chatchat.api.format.PriorityFormat;
 import at.helpch.chatchat.api.user.ChatUser;
 import at.helpch.chatchat.api.user.User;
 import at.helpch.chatchat.channel.ChannelTypeRegistryImpl;
+import at.helpch.chatchat.command.ChatToggleCommand;
 import at.helpch.chatchat.command.DumpCommand;
 import at.helpch.chatchat.command.FormatTestCommand;
 import at.helpch.chatchat.command.IgnoreCommand;
@@ -143,6 +144,7 @@ public final class ChatChatPlugin extends JavaPlugin {
     public void onDisable() {
         hookManager().hooks().forEach(Hook::disable);
         hookManager().vanishHooks().forEach(Hook::disable);
+        hookManager().muteHooks().forEach(Hook::disable);
         getServer().getServicesManager().unregisterAll(this);
 
         if (!dataSaveTask.isCancelled()) dataSaveTask.cancel();
@@ -266,7 +268,8 @@ public final class ChatChatPlugin extends JavaPlugin {
             new ReloadCommand(this),
             new MentionToggleCommand(this),
             new FormatTestCommand(this),
-            new DumpCommand(this)
+            new DumpCommand(this),
+            new ChatToggleCommand(this)
         ).forEach(commandManager::registerCommand);
 
         if (configManager.settings().privateMessagesSettings().enabled()) {

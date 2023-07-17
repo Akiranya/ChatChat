@@ -5,6 +5,7 @@ import at.helpch.chatchat.api.channel.Channel;
 import at.helpch.chatchat.api.event.ChatChatEvent;
 import at.helpch.chatchat.api.user.ChatUser;
 import at.helpch.chatchat.api.user.User;
+import at.helpch.chatchat.placeholder.MiniPlaceholderContext;
 import at.helpch.chatchat.user.ConsoleUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
@@ -75,7 +76,6 @@ public final class MessageProcessor {
      * @param channel    the channel to which the message being sent
      * @param message    the message (which is cleansed)
      * @param async      whether it's async or not
-     *
      * @return true if this is allowed to be sent; otherwise false
      */
     public static boolean process(
@@ -157,7 +157,7 @@ public final class MessageProcessor {
                     sourceUser.player(),
                     chatTarget.player(),
                     mentionResult.message(),
-                    plugin.miniPlaceholdersManager().compileTags(false, sourceUser, targetUser)
+                    plugin.miniPlaceholdersManager().compileTags(MiniPlaceholderContext.builder().inMessage(false).sender(sourceUser).recipient(targetUser).build())
                 );
 
                 targetUser.sendMessage(component); // Send message to this recipient
@@ -181,7 +181,7 @@ public final class MessageProcessor {
                 chatEvent.format(),
                 sourceUser.player(),
                 mentionResult.message(),
-                plugin.miniPlaceholdersManager().compileTags(false, sourceUser, targetUser)
+                plugin.miniPlaceholdersManager().compileTags(MiniPlaceholderContext.builder().inMessage(false).sender(sourceUser).recipient(targetUser).build())
             );
 
             targetUser.sendMessage(component); // Send message to this recipient
@@ -209,7 +209,7 @@ public final class MessageProcessor {
             sourceUser.player(),
             sourceUser.player(),
             mentionResult.message(),
-            plugin.miniPlaceholdersManager().compileTags(false, sourceUser, sourceUser)
+            plugin.miniPlaceholdersManager().compileTags(MiniPlaceholderContext.builder().inMessage(false).sender(sourceUser).recipient(sourceUser).build())
         );
 
         sourceUser.sendMessage(component); // Send message to the sender itself
@@ -232,7 +232,6 @@ public final class MessageProcessor {
      * @param user      the user who sends the message
      * @param recipient the user who receives the message
      * @param message   the message
-     *
      * @return a component deserialized from the given params
      */
     public static @NotNull Component processMessage(
@@ -263,7 +262,7 @@ public final class MessageProcessor {
             resolver.resolver(Placeholder.component("item", user.player().getInventory().getItemInMainHand().displayName()));
         }
 
-        resolver.resolvers(plugin.miniPlaceholdersManager().compileTags(true, user, recipient));
+        resolver.resolvers(plugin.miniPlaceholdersManager().compileTags(MiniPlaceholderContext.builder().inMessage(true).sender(user).recipient(recipient).build()));
 
         return !user.hasPermission(URL_PERMISSION)
             ? USER_MESSAGE_MINI_MESSAGE.deserialize(message, resolver.build())

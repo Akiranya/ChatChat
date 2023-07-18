@@ -62,7 +62,7 @@ tasks {
             )
         }
     }
-    register("deployJar") {
+    register("deployJarFresh") {
         dependsOn(build)
         doLast {
             exec {

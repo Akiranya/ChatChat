@@ -33,7 +33,7 @@ public final class HookManagerImpl implements HookManager {
         constructors.add(hookCreator::createDsrvHook);
         constructors.add(hookCreator::chatChatTownyHook);
         constructors.add(hookCreator::essentialsVanishHook);
-        constructors.add(hookCreator::superVanishHook);
+        //constructors.add(hookCreator::superVanishHook); // Mewcraft - jitpack is down
         constructors.add(hookCreator::griefPreventionSoftMuteHook);
     }
 

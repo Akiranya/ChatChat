@@ -33,7 +33,7 @@ dependencies {
     compileOnly(libs.towny) { isTransitive = false }
     compileOnly(libs.essentials) { isTransitive = false }
     compileOnly(libs.discordsrv) { isTransitive = false }
-    compileOnly(libs.supervanish) { isTransitive = false }
+    // compileOnly(libs.supervanish) { isTransitive = false } // Mewcraft - jitpack is down
     compileOnly(libs.griefprevention) { isTransitive = false }
 }
 
